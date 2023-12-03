@@ -1,0 +1,220 @@
+>>>>>>>>>>>>...
+
+Tests often run in an environment without access to a real rendering surface like a browser. For these environments, we recommend simulating a browser with jsdom, a lightweight browser implementation that runs inside Node.js.
+
+>>>>>>>>>>>>...
+
+Frameworks like Cypress, puppeteer and webdriver are useful for running end-to-end tests.
+
+>>>>>>>>>>>...
+
+INTRODUCTION
+
+Jest is a JavaScript test runner that lets you access the DOM via jsdom. While jsdom is only an approximation of how the browser works, it is often good enough for testing React components. 
+
+Libraries for testuing:
+
+1. JEST
+2. React testing libraries
+
+JEST --> a javascript testing framework. It is a test runner that finds the test, run it, and send back the results in human readable manner.
+
+RTL --> Javascript testing utility that provides virtual DOM for testing React components.
+
+The core library is called DOM testing library and RTL is simly a wrapper around this core library to test react applications in easier way.
+
+We need to use both the librarues in order to do teh testing. They are not alternative to reach other
+
+>>>>>>>>>>>>>>>>>
+
+Types of test
+
+1. Unit Test
+2. Integration test
+3. End-to-end test
+
+Unit test --> Each function is test independently. Any dependencies are mocked. They are faster and run independently
+Integration test --> Focus is on testing a combination of units and ensuring they work together. Take longer then unit tests
+
+E2E  --> Fcous is on testing the entire application flow and ensuring it works as designed from start to finish. Involves a real UI, a real backend backend database, and real services etc,
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+Pyramid approach can be followed can be followed to write the tests:
+
+Unit tests at the bottom, Integration tests int he middle, and at top end to end tests.
+
+RTL philosophy:
+
+The more your tests resemble the way your software is used, the more confidence they can give you.
+
+>>>>>>>>>>>>>>>>>>>>>>>
+
+What is automated test in the code:
+
+Automated test is the piece of code that throws an error if expected output is diff from actual output.
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+npx create-react-app . --template typescript
+
+JEST and RTL is automatically installed
+
+>>>>>>>>>>>>>>>>>>>>>>>>
+
+npm test ---> to run the test
+
+
+>>>>>>>>>>>>>>>>>>
+
+test(name, fn, timeout)
+
+The first argument is the test name used to identify the test
+The second argument is a function that contains the expectations to test
+the third argument is the timeout whihc is an optional argument for specifying how long to wait before aborting the test. The default value is 5 seconds.
+
+
+
+render method from react-testing-library renders the virtual dom
+
+render and expect are the 2 methods that jest automatically provides globally. You dont need to import them.
+
+>>>>>>>>>>>>>>>>>>
+
+
+const check = screen.getByText(/hello/i);
+
+this checks the hello text irrespective of the case of the word
+
+>>>>>>>>>>>>>>>>>>>
+
+Test Driven Development (TDD)
+
+It is a software development process where you write the tests before writing the software code. Once the tests have been written, you then write the code to ensure the tests pass.
+
+1. Create tests that verify the functionality of a specific feature. At this point all the tests should fail.
+2. Write software code that will run the tests successfully when re-executed.
+3. Refactor the code for optimiztion while ensuring the tests continue to pass.
+
+This is also knowm as red-green testing as all the tests from a red failed state to a green passed state.
+
+>>>>>>>>>>>>>>>>>>>>
+
+JEST watch mode
+
+Watch mode is an option that we can pass to JEST asking to watch files that have changed since the last commit and execute tests related only to those changed files
+
+An optimization designed to make your tests run faster regardless og how many tests you have
+
+When we run npm start, jest will start in watch mode and run only those files that are changed since tha last commit.
+
+>>>>>>>>>>>>>>>>>>>>>
+
+Filter the tests picked up by JEST
+
+
+when you run npm test, it provides you various options to run the tests, or filter the tests.
+
+You can filter the tests you want to run using the filenames, testnames
+
+you can use test.only to run only that test
+
+When you mark multiple tests and/or fixtures with the only method, TestCafe runs all the tests and/or fixtures with the mark.
+
+
+test.skip will skip that test
+
+
+>>>>>>>>>>>>>>>>>>>>>>>
+
+Grouping test with JEST
+
+
+If you prefer to group your tests you can use GLOBAL describe method that jest provides.
+
+describe 
+
+describe(name, fn)
+
+The first argument is the group name
+The second argument is a function that contains the expectation to test
+
+describe.only and describe.skip also exists
+
+
+describe blocks can be nested
+
+Multiple describe blocks can be added in the same file
+
+on terminal, there can be confusion when u see the results if you have used the keyword "describe"
+
+It will show "Test Suites" and "Tests"
+
+Test Suites corresponds to the individual files and not the describe inside the file.
+Tests corresponds to each test.
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>
+
+File name conventions that create-react-app follows:
+
+Following name conventions are allowed for the test files in JEST.
+
+.test.js or .test.tsx
+.spec.js or .spec.tsx
+.js or .tsx suffix in "__tests__" folder
+
+Recommendation is to always to put yout tests next to the code they are testing, so that relative imports are shorter.
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>
+
+There is alternative to the "test" global method and its name is "it"
+
+fit is an alternative to test.only
+xit is an alternative to test.skip
+
+>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Code coverage with JEST
+
+A metric that can help you understand how much of your software code is tested:
+
+1. Statement coverge --> how many of the statements in the software code have been executed
+2. Branches coverage --> how many of the branches of the control structures(if statements for            instance) have been executed
+3. Function coverage --> how many of the functions defined have been called
+4. Line coverage --> how  many lines of the source code have been tested
+
+Best part of jest is without any information you can obtain the information about all types of coverage.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
