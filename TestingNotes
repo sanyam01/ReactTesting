@@ -191,9 +191,888 @@ A metric that can help you understand how much of your software code is tested:
 
 Best part of jest is without any information you can obtain the information about all types of coverage.
 
+add under scripts in package.json
 
 
 
+"coverage":"react-scripts test --coverage --watchAll --collectCoverageFrom='src/components/**/*.{ts, tsx}'"
+
+watchAll --> will wathc all the test cases and not the ones that changed after commit 
+collectCoverageFrom --> only those files whose path is mentioned
+
+u can add the files here that you want to ignore
+--collectCoverageFrom='!src/components/**/*.{types, stories, constants, tests, spec}.{ts, tsx}}
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Coverage threshold
+
+We can set a min thresholld enforcement, if the threshold dont meet, jest will fail
+
+Add below in package.json
+
+"jest": {
+    "coverageThreshold": {
+      "global": {
+        "branches": 80, // 80% coverage
+        "functions": 80, //80% coverage
+        "lines": 80, // 80% coverage
+        "statements": -10 // more than 10 uncovered statements
+      }
+    }
+  }
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+Assertions
+
+When writing tests we often need to check that values meet certain conditions.
+Assertions decide if the test passes or fails.
+
+Various ways to do the assertions:
+
+1. expect
+
+expect(value) --> The argument should be the value that your code produces
+
+Typically, you will use expect along with a "matcher" function to assert something about a value.
+
+A matcher can optionally accept an argument which is the correct expected value. 
+
+e.g. toBeInTheDocument()
+
+What are the diff matcher functions:
+
+https://jestjs.io/docs/using-matchers
+
+some list you might not find, because jest provides some specific matchers to test with dom and they are part of another library jest-dom
+
+It is already installed with create-react-app
+
+setupTests.ts --> has this lib imported. IT automatically run before running any test
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+What to test
+
+There is no set rule but here is a guideline:
+
+1. Start by testing that component renders without any error
+2. Test that component renders with given set of props
+3. Component renders in diff states [based in diff conditions]
+4. Test if component reacts to events
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+What not to test
+
+1. Implementation details --> Test how component behaves not how it is implemented
+2. Dont test third party code
+3. Dont test code that is not important from users point of view
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+RTL Queries
+
+Every test we write generally involves the follwoing basic steps:
+
+1. Render the component
+2. Find an element rendered by the component
+3. Assert against the element found in step2 which will pass or fail the test
+
+1. and 3. already covered, we have rendered using test and then put some assertions.
+
+Step 2 Finding an element is the core part of the react testing library, there are specifically calls for this. We use queries to do that.
+
+Queries are the methods that Testing library provides to find the elements on the page.
+
+There are several types of queries:
+
+1. To find single element on the page, we have:
+
+getBy..
+queryBy..
+findBy..
+
+2. To find multiple elements on the page, we have:
+
+getAllBy..
+queryAllBy..
+findAllBy..
+
+Each of these methods are combined with suffix, to form actual query.
+
+Suffix can be one of Role, LabelText, PlaceHolderText, Text, DisplayValue, AltText, Title, and finally TestId
+
+a) getBy.. queries --> to find an element of the document.
+This class of queries return the matching node for a query, and throw a descriptive error if no elements match or if more than one match is found.
+
+
+The suffix can be one of Role, LabelText, PlaceHolderText, Text, DisplayValue, altText, Title and finally TestId
+
+**** getByRole --> queries for the elements with the given role
+
+Role refers to the ARIA(Accessible Rich Internet Applications) role which provides semantic meaning to content to ensure people using assistive technologies are able to use them. By default, many semantic elements in HTML have a role.
+
+e.g Button element has a button role, anchor element has a link role, h1 to h6 elements have a heading role, checkboxes have a checkbox role, radio buttons have a radio role and so on. However, if some element do not have a default role or if you want to specify a different role, the role attribute can be used to add the attribute role.
+
+e.g. To use an anchor element as a button in the navbar, you can add role="button"
+
+Irrespective of the default role or the role give to an element, it can queried using getByRole.
+
+Where to check all the default roles:
+
+testing-library.com/docs/queries/byrole
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+getByRole take 2 options that can tweek their behavior
+
+if there are multiple elemets with given role, getByRole will throw an error. In such cases you can add options to the :
+const nameElement = screen.getByRole('textbox', {
+            name: 'Name'
+        });
+        
+The accessible name is for simple cases equal to :
+1. the label of a form element
+2. the text content of a button
+3. the value aria-label attribute
+
+Directly using the text
+
+const pageHeading = screen.getByRole('heading', {
+            name: 'Job application form'
+        });
+        
+        
+        // can be done using the level for heading
+        // directly using the text
+        const pageHeading = screen.getByRole('heading', {
+            // name: 'Job application form'
+            level: 1,
+        });
+        expect(pageHeading).toBeInTheDocument();
+
+
+        const section1 = screen.getByRole('heading', {
+            // name: 'section 1'
+            level: 2
+        });
+
+there are more getByRole Options:
+
+1. name
+2. level
+3. hidden
+4. selected
+5. checked
+6. pressed
+
+Read these from docs
+
+getByRole is normally the best thing
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+getByLabelText will search for the label that matches the given text, then find the element associated with that label.
+
+getByLabelText even works with the wrapper, i.e. if the label is wrapper and there is text inside it, you can check for getByLabelText
+
+There is one option for the getByLabelText, if there are more then one labels with same name.
+
+getByLabelText("Name", {selector:'input'}), selector is accepts the html element type as value.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+getByPlaceholderText
+
+getByPlaceholderText will search for all elements with a placeholder attribute and find one that matches the given text.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+getByText
+
+getByText will search for all elements that have a text node with the textContent matching the given text
+
+Typically, you'd use this to find paragraph, duv or span elements.
+
+This also expects a selector option and this works exaxctly as the selector option of getByLabelText.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+getByDisplayValue
+
+this returns the input, textarea, or select element that has the matching display value
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+getByAltText
+
+it will return the element that has the given alt text
+
+This method only support the elements which accept an alt attribute like <img>, <input>, <area>, or custom HTML elements.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+getByTitle
+
+it will return the elemet that has the matching title attribute
+
+<span title="close">X</span>
+
+const closeElement = screen.getByTitle('close');
+        expect(closeElement).toBeInTheDocument();
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+getByTestId
+
+this returns the element that has the matching data-testid attribute
+
+<div data-testid='custom-element'>
+            Custom HTML element
+        </div>
+        
+        const customElement = screen.getByTestId('custom-element');
+        expect(customElement).toBeInTheDocument();
+        
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+So, we have learnt 8 Query methods provided by React testing library to test the elements present in the DOM
+
+Q is when to use one over the other:-
+
+RTL library has a good section for this. Now according to the guiding principal:
+
+"Your test should resemble how users interact with your code (component, page, etc) as much as possible".
+
+Priority list in decreasing order:
+
+1. getByRole
+2. getByLabelText
+3. getByPlaceholderText
+4. getByText
+5. getByDisplayValue
+
+
+Almost all the above should be used to test components. If you still cant find the elements, then use below:
+
+6. getByAltText
+7. getByTitle
+
+There is caviat that above these functions behavior is diff with diff browsers
+
+Last resort is getByTestId
+
+So, all these are based on how users interact with the components.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Query Multiple Elements
+
+Find the multiple elements in the DOM
+
+getAllBy returns an array of all matching nodes for a query, and throws an error if no elements match
+
+Every getBy query has a corresponding getAllBy query
+
+getAllByRole
+
+
+export const Skills = (props: SkillsProps) => {
+    const { skills } = props;
+    return (
+        <>
+            <ul>
+                {skills.map((skill:any) => {
+                    return <li key={skill}>{skill}</li>
+                })}
+            </ul>
+        </>
+    );
+}
+
+
+test('renders a list of skills', () => {
+        render(<Skills skills={skills} />);
+        const allListItems = screen.getAllByRole('listitem');
+        expect(allListItems).toHaveLength(3);
+
+
+    })
+    
+    
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+TextMatch represents what the first arguments to the query function can be: 
+
+What is TextMatch?
+
+TextMatch represents a type which can either be a :
+1. string
+2. regex
+3. function
+
+1. string match
+
+<div>Hello World</div>
+screen.getByText("Hello World"); // full string match
+screen.getByText("llo Worl", {exact:false}); // substring match
+
+screen.getByText("hello World", {exact:false}); //  ignore case
+
+2. regex match
+
+<div>Hello World</div>
+
+screen.getByText(/World/); // substring match
+screen.getByText(/World/i) // substring match, ignore case
+screen.getByText(/^hello world$/i) // full string match, ignore case
+
+3. Text match as custom function
+
+function signauter should be as follows:
+
+(content?:string, element?: Element | null) => boolean
+
+both are optional, and this should return true for match and false for mismatch
+
+e.g. screen.getByText((content) => content.startsWith("Hello));
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+queryBy
+
+now above all queries test if the elements are rendered in the DOM, what if the element is not rendered.
+
+getBy or getAllBy throws an error if they cannot find an document. This is where queryBy and queryAllBy comes into picture
+
+queryBy :- 
+
+return the matching node for a query, and return null if no elements match
+userful for asserting an element  that is not present
+throws an error if more than one match is found
+
+queryAllBy:-
+
+return an array of all matching nodes for a query, and return an empty array if no elements match
+
+const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+{isLoggedIn && <button onClick={() => setIsLoggedIn(false)}>Start Learning</button>}
+
+ test('Start learning button', () => {
+        render(<Skills skills={skills} />);
+        const start = screen.queryByRole('button', {
+            name: 'Start Learning'
+        });
+        expect(start).toNotBeInTheDocument();
+
+    });
+    
+    In this case, if you would use getByRole, then test would have failed
+    
+    Similarily, there are all the queryBy and queryAllBy for all the above queries
+    
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+findBy query
+
+Appearance / Disappearance
+
+What if the elements are not present in the DOM to begin with but make their way into the DOM after some time
+
+For example, data that is fetched from the server will be rendered only after a few milli seconds.
+
+getBy and queryBy are not sufficient to handle this scenerio
+
+import { SkillsProps } from './skills.types';
+import { useEffect, useState } from 'react';
+
+export const Skills = (props: SkillsProps) => {
+    const { skills } = props;
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+    // after 500 ms
+    useEffect(() => {
+        setTimeout(() => {
+            setIsLoggedIn(true);
+        }, 500);
+    }, []);
+    return (
+        <>
+            <ul>
+                {skills.map((skill: any) => {
+                    return <li key={skill}>{skill}</li>
+                })}
+            </ul>
+            {isLoggedIn && <button onClick={() => setIsLoggedIn(false)}>Start Learning</button>}
+            {!isLoggedIn && <button onClick={() => setIsLoggedIn(true)}>Login</button>}
+
+        </>
+    );
+}
+
+// queryByRole and getByRole will fail in this case, because of the 500ms delay
+    // here findBy and findAllBy comes into picture
+    test('Start learning button is eventually displayed', () => {
+        render(<Skills skills={skills} />);
+        const start = screen.queryByRole('button', {
+            name: 'Start Learning'
+        });
+        expect(start).not.toBeInTheDocument();
+
+    });
+    
+findBy:
+a) returns a promise which resolves when an element is found which matches the given query
+b) The promise is rejected if no element is found or if more than one element is found after a deafutl mode of 1000ms
+
+findAllBy:
+
+a) returns a promise which resolves to an array of elements when any any elements are found which match the given query
+b) The promise is rejected if no elements are found after a default timeout of 1000ms
+
+
+These will run instead
+
+test('Start learning button', () => {
+        render(<Skills skills={skills} />);
+        const start = screen.queryByRole('button', {
+            name: 'Start Learning'
+        });
+        expect(start).not.toBeInTheDocument();
+
+    });
+    // queryByRole and getByRole will fail in this case, because of the 500ms delay
+    // here findBy and findAllBy comes into picture
+    test('Start learning button is eventually displayed',async () => {
+        render(<Skills skills={skills} />);
+        const start = await screen.findByRole('button', {
+            name: 'Start Learning'
+        });
+        expect(start).toBeInTheDocument();
+
+    });
+    
+For findByRole, we need async and await
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+findBy has a default timeout of 1000ms. So, in above component if you change the time in useEffect to 1001 ms, the test will fail
+
+
+ test('Start learning button is eventually displayed',async () => {
+        render(<Skills skills={skills} />);
+        const start = await screen.findByRole('button', {
+            name: 'Start Learning'
+        }, {
+            timeout: 2000
+        });
+        expect(start).toBeInTheDocument();
+
+    });
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Manual Queries Tutorial 32
+
+So, in nutshell, until now RTL library provides 3 tyes of queries:
+
+1. getBy and getAllBy
+2. queryBy and queryAllBy
+3. findBy and findAllBy
+
+On top these queries, it is possible to write manual queries. 
+
+You can use the regular querySelector DOM API to find elements.
+
+However, normally you should use the above 3 types of queries because other elements are normally not visible by the users.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Debugging with RTL
+
+just see the error log and whats happening
+
+
+logRoles Function prints list of all the implicit aria-roles within a tree of DOM nodes. Each role containing the list of all nodes that match that role.
+import { render, screen, logRoles } from '@testing-library/react';
+
+ const  view =  render(<Skills skills={skills} />);
+      logRoles(view.container);
+      
+      This will list all the roles.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Testing playground --> extension --> chrome extension
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+User Events in RTL
+
+A click using a mouse or a keypress using a keyboard
+Software has to repond to such interactions
+Tests should also ensure the interactions are handled as expected
+
+To test user interactions --> user-event library is used
+
+A companion library for testing library that simulates user interactions by dispatching the events that would happen if the interaction took place in a browser
+It is the recommended way to test the user interactions
+
+fireEvent is the alternative to user-event
+
+fireEvent is a method from RTL which is used to dispatch DOM events. However, user-event simulates full-interactions, which nay fire multiple events and do additional checks along the way.
+
+For example, we can dispatch the change event on an input field using fireEvent
+
+When a user types into a text box, the element has to be focused, nad then keyboard and input events are fired and the selection and value on the element are manipulated as they type.
+
+user-event allows you to describe a user interaction instead of a concrete event. It adds visibility and interactibility checks along the way and manipulates the DOM just like a user interaction in the browser would. It factors in that the broswer e.g. wouldn't let a user click a hidden element or type in a disabled text box.
+
+user-event library is installed by default. 
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Pointer interactions
+
+Mouse interactions
+
+
+click() is not a pointer API. It is a convinience API that internally calls a pointer API
+
+Convinience APIs are what you typically use:
+
+click()
+dbClick()
+tripeClick()
+hover()
+unhover()
+
+Pointer APIS
+
+pointer({keys: '[MouseLeft]'}) // left click
+pointer({keys: '[MouseLeft][MouseRight]'}) // left click followed by right click
+
+
+Similarily, there are more apis like this
+
+
+All user APIs are async
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Keyboard interactions
+
+type() is utility API
+tab() is a convinience API --> this is the only 1 convinience API
+
+Utility apis are multiple:
+
+clear()
+selectOptions()
+deselectoptions()
+upload()
+
+There are some clipboard APIS
+
+copy()
+cut()
+paste()
+
+there are keyboard apis
+
+keyboard('foo');
+there are more that you can check
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Providers
+
+how to test the components wrapped in a provider and how to test custom react hooks
+
+if you are using providers in you component, then in test cases also you need to wrap them with same providers, otherwise the tests will fail
+
+describe('renders text corrextly', () => {
+    render(<MuiMode />, {
+        wrapper: AppProviders
+    });
+    const headingElement = screen.getByRole('heading');
+    expect(headingElement).toHaveTextContent('dark mode');
+})
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Now, if you have a provider, we will need it to wrap around all the test cases. So, there is a way to do that.
+
+You will create a custom wrapper component.
+
+We created below component:
+
+import React, {ReactElement} from 'react'
+import {render, RenderOptions} from '@testing-library/react'
+import { AppProviders } from './providers/app-providers'
+
+const customRender = (
+  ui: ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>,
+) => render(ui, {wrapper: AppProviders, ...options})
+
+export * from '@testing-library/react'
+export {customRender as render}
+
+
+
+Now we use this render instead of render from testing library
+
+>>>>>>>>>>>>>>>>>>>>>>>>
+
+How to test custom react hooks with testing library
+
+After creating a custom hook, try this:
+
+describe('useCounter', () => {
+    test('should render the initial count', ()=>{
+        render(useCounter);
+        
+    })
+});
+
+This will throw an error because hook cannot be rendered like this, they cannot be invoked outside function component.
+
+For this purpose, react provides a renderHook, so use that instead of render
+
+import { renderHook } from '@testing-library/react';
+
+Also, hooks does not return a DOM elements. Instead render hook will wrap the hook in function component, invoke the hook and return the obkect from where we can destructire a property called result
+
+import { renderHook } from '@testing-library/react';
+import { useCounter } from './useCounter';
+
+describe('useCounter', () => {
+    test('should render the initial count', () => {
+        const { result } = renderHook(useCounter);
+        expect(result.current.count).toBe(0);
+    })
+     test('should accept and render the same initial count', () => {
+        const { result } = renderHook(useCounter, {
+            initialProps: {
+                initialCount: 10
+            }
+        });
+        expect(result.current.count).toBe(10);
+    })
+});
+
+>>>>>>>>>>>>>>>>>>>>>>>>>
+
+tests for the increment and decrement function work as expected
+
+act function
+
+act is a function that makes sure updates are processed before assertions are made.
+
+while using custom hooks or the code that causes the state updares, we have to  manually use the act as testing lubrary cannot do that automatically.
+
+ test('should increment the count', () => {
+        const { result } = renderHook(useCounter);
+        act(() => result.current.increment());
+        expect(result.current.count).toBe(1);
+    });
+
+    test('should decrement the count', () => {
+        const { result } = renderHook(useCounter);
+        act(() => result.current.increment());
+        expect(result.current.count).toBe(-1);
+    });
+
+>>>>>>>>>>>>>>>>>>>>>>>>
+
+Section 7
+
+Mocking when writing tests with react testing library
+
+ // mocks the functions that are called, checks when button is pressed
+    // the functions are called or not
+    // we relied on jest mock functions to replicate the functionality of functions
+
+test('handlers are called', async () => {
+
+        user.setup();
+
+        const incrementHanlder = jest.fn();
+        const decrementHanlder = jest.fn();
+
+        render(<CounterTwo
+            count={0}
+            handleDecrement={incrementHanlder}
+            handleIncrement={incrementHanlder} />)
+        const incrementButton = screen.getByRole('button', { name: "Increment" });
+        const decrementButton = screen.getByRole('button', { name: "Decrement" });
+        await user.click(incrementButton);
+        await user.click(decrementButton);
+        expect(incrementHanlder).toHaveBeenCalledTimes(1);
+        expect(decrementHanlder).toHaveBeenCalledTimes(1);
+
+    })
+    
+>>>>>>>>>>>>>>>>>>>>>>
+
+Mocking functions
+
+mocking HTTP requests using library mock-service-worker
+
+Real APIs are only written in end to end tests. They are not written in unit tests or integration tests. because its not feasible to hit the real APIs again and again and sometimes they even charge you for it.
+
+So, what we have to do is mock the HTTP requests in out tests.
+
+For mocking, the go to package is Mock Service Worker.
+
+>>>>>>>>>>>>>>>>>>>>>>
+
+Setup for MSW --> Mocl Service Worker
+
+Things in MSW seems to be changed
+ from lecture 45 - 47
+ 
+ https://www.youtube.com/watch?v=niqiP_5MrRA&list=PLC3y8-rFHvwirqe1KHFCHJ0RqNuN61SJd&index=46&ab_channel=Codevolution
+ 
+ 
+ Check for MSW
+ 
+>>>>>>>>>>>>>>>>>>>>>>>
+
+Continue from 48
+
+Static Analysis Testing
+
+Process of verifying that you code meets certain expectations without actually running it
+
+you can ensure 	consisent style and formatiing
+check for common mistakes and possible bugs
+limit the complexity of code
+verify type consistency
+
+how it diff from testing we hace done so far:
+
+Static testing analyse aspects of the code without running the test code. it checks how code is well written
+
+5 tools for static testing
+
+1. Typescript
+2. ESlint
+3, Prettier
+4. Husky
+5. lint-staged
+
+
+typescript you already know well
+
+>>>>>>>>>>>>>>>>>>>>>>
+
+Section  49 ESlint
+
+ESLint is a tool for identifying and reporting on patterns found in ECMAscript/JavaScript code, with the goal of making code more consistent and avoiding bugs.
+
+npm install --save-dev eslint-plugin-jest-dom
+
+
+eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest",
+      "plugin:jest-dom/recommended"
+    ]
+    
+    // add like above in the package.json file
+    
+    This will add list of recommended rules in jest dom
+    
+You can also create a script to run this in the folder and get all the errors at once
+
+Add this in scripts in package.json
+
+"lint":"eslint --ignore-path .gitignore ."
+
+and then run npm run lint
+
+>>>>>>>>>>>>>>>>>>>>>>>
+
+Prettier
+
+To install prettier in your project and pin its version as recommended, run:
+
+npm install prettier -D --save-exact
+
+
+"format":"prettier --ignore-path .gitignore --write \"**/*.{ts, tsx,css,scss}\""
+
+apart from the gitignore take into consderation all the files
+
+now you can run git run format --> and it will show you the errors
+
+For adding you configuration related to the prettier, you can create .prettierrc.json file and add the configuration
+
+e.g.
+
+{
+   "semi":false, // dont add semicolons
+   "singleQuote":true // use singlequotes
+}
+
+This is added in the json file.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Turns off all rules that are unnecessary or might conflict with Prettier.
+
+npm i eslint-config-prettier
+ "eslint-config-prettier" 
+ 
+ install this if you have both eslint and prettier. These will avoid conflicts
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Husky
+
+Husky is a tool that helps improve your commits and more
+
+npm install husky --save-dev
+
+It helps run linter and prettier before a commit, so that it always is the same for all the developers
+
+Inside the husky precommit file --> npm run lint && format
+
+Writing this line will run these commands before commit.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+lint-staged
+
+Husky lints and format the entire codebase
+
+lint-staged only fomats and lints those files that are to be committed.
+
+npm i lint-staged
+
+now in precommit.tsx
+
+do npm run lint-staged
+
+Now this will only do the format and eslint checks on files that need to be commited
 
 
 
@@ -207,6 +1086,23 @@ Best part of jest is without any information you can obtain the information abou
 
 
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
